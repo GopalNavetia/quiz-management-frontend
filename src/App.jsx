@@ -2,6 +2,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import AuthPage from "./pages/auth/AuthPage.jsx";
 import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
 import StudentDashboard from "./pages/student/StudentDashboard.jsx";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   const router = createBrowserRouter([
@@ -11,11 +12,19 @@ function App() {
     },
     {
       path: "/student/Dashboard",
-      element: <StudentDashboard />
+      element: (
+        <ProtectedRoute>
+          <StudentDashboard />
+        </ProtectedRoute>
+      )
     },
     {
       path: "/admin/dashboard",
-      element: <AdminDashboard />
+      element: (
+        <ProtectedRoute>
+          <AdminDashboard />
+        </ProtectedRoute>
+      )
     }
   ]);
 
