@@ -15,15 +15,15 @@ function AuthPage() {
         const token = localStorage.getItem("token");
         const role = localStorage.getItem("role");
 
-        if (token) {
-            if (role === "ADMIN") {
-                navigate("/admin/dashboard");
-            } else {
-                navigate("/student/dashboard");
-            }
+        if (!token) return;
+
+        if (role === "ADMIN") {
+            navigate("/admin/dashboard", { replace: true });
+        } else {
+            navigate("/student/dashboard", { replace: true });
         }
 
-    }, []);
+    }, [navigate]);
 
     const [loginData, setLoginData] = useState({
         email: "",
@@ -110,6 +110,8 @@ function AuthPage() {
 
             localStorage.setItem("token", response.data.token);
             localStorage.setItem("role", response.data.role);
+            localStorage.setItem("firstName", response.data.firstName);
+            localStorage.setItem("lastName", response.data.lastName);
 
             // Role Based Navigation
             if (response.data.role === "ADMIN") {
@@ -261,7 +263,7 @@ function AuthPage() {
         <div className="min-w-screen min-h-screen flex items-center justify-center bg-gray-50 p-4">
             <div className="w-full max-w-sm border border-black/10 bg-white rounded-2xl shadow-lg">
                 {/* Header */}
-                <div className="px-6 py-5 text-center">
+                <div className="cursor-default px-6 py-5 text-center">
                     <h1 className="font-extrabold text-2xl">Quiz Management System</h1>
                     <p className="text-gray-400 text-sm mt-1">Log in or create a student account</p>
                 </div>
@@ -271,13 +273,13 @@ function AuthPage() {
                     <div className="flex bg-gray-200 rounded-full p-1 gap-1">
                         <button
                             onClick={() => { setRole("student"); setAuthType("login"); }}
-                            className={`flex-1 text-sm py-2 rounded-full font-medium ${role === "student" ? "bg-black text-white" : "text-gray-600"}`}
+                            className={`flex-1 cursor-pointer text-sm py-2 rounded-full font-medium ${role === "student" ? "bg-black text-white" : "text-gray-600"}`}
                         >
                             Student
                         </button>
                         <button
                             onClick={() => { setRole("admin"); setAuthType("login"); }}
-                            className={`flex-1 text-sm py-2 rounded-full font-medium ${role === "admin" ? "bg-black text-white" : "text-gray-600"}`}
+                            className={`flex-1 cursor-pointer text-sm py-2 rounded-full font-medium ${role === "admin" ? "bg-black text-white" : "text-gray-600"}`}
                         >
                             Admin
                         </button>
@@ -287,14 +289,14 @@ function AuthPage() {
                         <div className="flex items-center gap-6 border-b pb-3">
                             <button
                                 onClick={() => setAuthType("login")}
-                                className={`text-sm font-semibold ${authType === "login" ? "text-black border-b-2 border-indigo-600 pb-1" : "text-gray-400"}`}
+                                className={`cursor-pointer text-sm font-semibold ${authType === "login" ? "text-black border-b-2 border-indigo-600 pb-1" : "text-gray-400"}`}
                             >
                                 Log in
                             </button>
                             {role === "student" && (
                                 <button
                                     onClick={() => setAuthType("register")}
-                                    className={`text-sm font-semibold ${authType === "register" ? "text-black border-b-2 border-indigo-600 pb-1" : "text-gray-400"}`}
+                                    className={`cursor-pointer text-sm font-semibold ${authType === "register" ? "text-black border-b-2 border-indigo-600 pb-1" : "text-gray-400"}`}
                                 >
                                     Register
                                 </button>
@@ -328,13 +330,13 @@ function AuthPage() {
                                     )}
 
                                     <div className="text-right mt-2">
-                                        <button type="button" className="text-indigo-600 text-sm">Forgot password?</button>
+                                        <button type="button" className="cursor-pointer text-indigo-600 text-sm">Forgot password?</button>
                                     </div>
 
                                     <button
                                         type="submit"
                                         disabled={isLoading}
-                                        className="mt-4 w-full bg-indigo-600 text-white py-3 rounded-lg font-medium" >
+                                        className="mt-4 w-full cursor-pointer disabled:cursor-not-allowed disabled:opacity-70 bg-indigo-600 text-white py-3 rounded-lg font-medium" >
                                         {isLoading ? "Logging in..." : "Log in"}
                                     </button>
                                 </div>
@@ -401,7 +403,7 @@ function AuthPage() {
                                     <button
                                         type="submit"
                                         disabled={isLoading}
-                                        className="mt-4 w-full bg-indigo-600 text-white py-3 rounded-lg font-medium">
+                                        className="mt-4 w-full cursor-pointer disabled:cursor-not-allowed disabled:opacity-70 bg-indigo-600 text-white py-3 rounded-lg font-medium">
                                         {isLoading ? "Creating account..." : "Create Account"}
                                     </button>
                                 </div>
@@ -416,7 +418,7 @@ function AuthPage() {
                                     Don't have an account?{" "}
                                     <button
                                         type="button"
-                                        className="text-indigo-600 font-medium"
+                                        className="cursor-pointer text-indigo-600 font-medium"
                                         onClick={() => setAuthType("register")}
                                     >
                                         Register
@@ -427,7 +429,7 @@ function AuthPage() {
                                     Already have an account?{" "}
                                     <button
                                         type="button"
-                                        className="text-indigo-600 font-medium"
+                                        className="cursor-pointer text-indigo-600 font-medium"
                                         onClick={() => setAuthType("login")}
                                     >
                                         Log in

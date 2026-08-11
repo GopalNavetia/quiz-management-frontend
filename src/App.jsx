@@ -1,34 +1,40 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import AuthPage from "./pages/auth/AuthPage.jsx";
-import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
-import StudentDashboard from "./pages/student/StudentDashboard.jsx";
+
+import AuthPage from "./pages/auth/AuthPage";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import StudentDashboard from "./pages/student/StudentDashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
-  const router = createBrowserRouter([
-    {
-      path: "/",
-      element: <AuthPage />
-    },
-    {
-      path: "/student/Dashboard",
-      element: (
-        <ProtectedRoute>
-          <StudentDashboard />
-        </ProtectedRoute>
-      )
-    },
-    {
-      path: "/admin/dashboard",
-      element: (
-        <ProtectedRoute>
-          <AdminDashboard />
-        </ProtectedRoute>
-      )
-    }
-  ]);
 
-  return <RouterProvider router={router} />;
+    const router = createBrowserRouter([
+        {
+            path: "/",
+            element: <AuthPage />
+        },
+
+        {
+            element: <ProtectedRoute role="ADMIN" />,
+            children: [
+                {
+                    path: "/admin/*",
+                    element: <AdminDashboard />
+                }
+            ]
+        },
+
+        {
+            element: <ProtectedRoute role="STUDENT" />,
+            children: [
+                {
+                    path: "/student/*",
+                    element: <StudentDashboard />
+                }
+            ]
+        }
+    ]);
+
+    return <RouterProvider router={router} />;
 }
 
 export default App;
