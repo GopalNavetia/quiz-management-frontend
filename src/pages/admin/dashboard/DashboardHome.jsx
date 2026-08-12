@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import AdminDashboardCard from "../../components/AdminDashboardCard";
-import { getAdminDashboard } from "../../api/adminDashboardApi";
+import AdminDashboardCard from "../../../components/AdminDashboardCard";
+import { getAdminDashboard } from "../../../api/adminDashboardApi";
 
 function DashboardHome() {
 

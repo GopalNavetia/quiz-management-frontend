@@ -15,6 +15,11 @@ function Navbar() {
         navigate("/"); 
     }
 
+    const handleManageAdminButton = () => {
+        setMenuOpen(false);
+        navigate("/admin/admins");
+    }
+
     return (
         <nav className="flex items-center justify-between bg-black px-4 py-2 text-white shadow-md">
             {/* Left side */}
@@ -57,15 +62,16 @@ function Navbar() {
 
                 {/* Click dropdown */}
                 {menuOpen && (
-                    <div className="absolute right-0 top-full z-50 mt-2 w-45 rounded-2xl bg-white p-2 text-gray-900 shadow-xl">
+                    <div className="absolute right-0 top-full z-50 mt-2 w-46 rounded-2xl bg-white p-2 text-gray-900 shadow-xl">
                         <button
                             type="button"
                             className="flex w-full cursor-pointer items-center gap-3 rounded-xl px-4 py-1 text-left text-base transition-colors hover:bg-gray-100"
+                            onClick={handleManageAdminButton}
                         >
                             <span className="text-sm text-gray-500">
                                 <i className="fa-solid fa-gear" />
                             </span>
-                            <span>Manage user</span>
+                            <span>Manage admin</span>
                         </button>
 
                         <div className="my-1 border-t border-gray-200" />

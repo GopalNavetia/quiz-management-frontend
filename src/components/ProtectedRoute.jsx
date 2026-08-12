@@ -10,6 +10,13 @@ function ProtectedRoute({ role }) {
     }
 
     if (role && userRole !== role) {
+        alert("You do not have permission to access this page.");
+
+        localStorage.removeItem("token");
+        localStorage.removeItem("role");
+        localStorage.removeItem("firstName");
+        localStorage.removeItem("lastName");
+        
         return <Navigate to="/" replace />;
     }
 

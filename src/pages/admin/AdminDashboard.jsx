@@ -1,14 +1,24 @@
 import { useRoutes } from "react-router-dom";
 import Navbar from "../../components/Navbar";
 import AdminSidebar from "../../components/AdminSidebar";
-import DashboardHome from "./DashboardHome";
-import UserManagement from "./UserManagement";
+import DashboardHome from "./dashboard/DashboardHome";
+import UserManagement from "./userManagement/UserManagement";
+import AddStudent from "./userManagement/AddStudent";
+import EditStudent from "./userManagement/EditStudent";
+import AdminManagement from "./adminManagement/AdminManagement";
+import AddAdmin from "./adminManagement/AddAdmin";
+import EditAdmin from "./adminManagement/EditAdmin";
 
 function AdminDashboard() {
     const DashboardRoutes = () => {
         return useRoutes([
             { path: "/dashboard", element: <DashboardHome /> },
-            { path: "/users", element: <UserManagement /> }
+            { path: "/users", element: <UserManagement /> },
+            { path: "/users/add", element: <AddStudent /> },
+            { path: "/users/edit/:studentId", element: <EditStudent /> },
+            { path: "/admins", element: <AdminManagement /> },
+            { path: "/admins/add", element: <AddAdmin /> },
+            { path: "/admins/edit/:adminId", element: <EditAdmin /> }
         ]);
     };
 

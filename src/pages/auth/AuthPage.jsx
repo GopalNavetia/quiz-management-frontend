@@ -27,8 +27,16 @@ function AuthPage() {
 
     const [loginData, setLoginData] = useState({
         email: "",
-        password: ""
-    })
+        password: "",
+        role: "STUDENT"
+    });
+
+    useEffect(() => {
+        setLoginData((prev) => ({
+            ...prev,
+            role: role.toUpperCase()
+        }));
+    }, [role]);
 
     const [loginErrors, setLoginErrors] = useState({
         email: "",
@@ -105,8 +113,6 @@ function AuthPage() {
         try {
 
             const response = await loginUser(loginData);
-
-            console.log(response);
 
             localStorage.setItem("token", response.data.token);
             localStorage.setItem("role", response.data.role);

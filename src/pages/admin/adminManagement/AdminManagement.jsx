@@ -1,59 +1,61 @@
 import { useEffect, useState } from "react";
-import { getAllUsers } from "../../api/adminDashboardApi";
+import { useNavigate } from "react-router-dom";
+import { getAllAdmins } from "../../../api/adminDashboardApi";
 
-function UserManagement() {
+function AdminManagement() {
+    const navigate = useNavigate();
+
     const [fetchData, setFetchData] = useState([]);
     const [loading, setLoading] = useState(true);
 
     const [currentPage, setCurrentPage] = useState(1);
     const [searchQuery, setSearchQuery] = useState("");
 
-    const studentsPerPage = 5;
+    const adminsPerPage = 5;
 
-    const getUsers = async () => {
+    const getAdmins = async () => {
         try {
             setLoading(true);
-            const response = await getAllUsers();
+            const response = await getAllAdmins();
             setFetchData(response?.data ?? response ?? []);
         } catch (error) {
-            alert(error.response?.data || "User Data Fetch Failed");
+            alert(error.response?.data || "Admin Data Fetch Failed");
             setFetchData([]);
         } finally {
             setLoading(false);
         }
     };
 
-    // Run once when the page loads
     useEffect(() => {
-        getUsers();
+        getAdmins();
     }, []);
 
-    // Filter students by search query (runs fresh every render — no need to cache it)
     const query = searchQuery.toLowerCase().trim();
-    const filteredStudents = query
-        ? fetchData.filter((student) => (student.name?.toLowerCase() || "").includes(query))
+    const filteredAdmins = query
+        ? fetchData.filter((admin) =>
+            `${admin.firstName || ""} ${admin.lastName || ""} ${admin.email || ""}`
+                .toLowerCase()
+                .includes(query)
+        )
         : fetchData;
 
-    const totalPages = Math.max(Math.ceil(filteredStudents.length / studentsPerPage), 1);
+    const totalPages = Math.max(Math.ceil(filteredAdmins.length / adminsPerPage), 1);
 
-    // Whenever the search query changes, jump back to page 1
     useEffect(() => {
         setCurrentPage(1);
     }, [searchQuery]);
 
-    // If the current page no longer exists
     useEffect(() => {
         if (currentPage > totalPages) {
             setCurrentPage(totalPages);
         }
     }, [currentPage, totalPages]);
 
-    // Pagination Logic
-    const startIndex = (currentPage - 1) * studentsPerPage;
-    const currentStudents = filteredStudents.slice(startIndex, startIndex + studentsPerPage);
+    const startIndex = (currentPage - 1) * adminsPerPage;
+    const currentAdmins = filteredAdmins.slice(startIndex, startIndex + adminsPerPage);
 
-    const showingStart = filteredStudents.length === 0 ? 0 : startIndex + 1;
-    const showingEnd = Math.min(currentPage * studentsPerPage, filteredStudents.length);
+    const showingStart = filteredAdmins.length === 0 ? 0 : startIndex + 1;
+    const showingEnd = Math.min(currentPage * adminsPerPage, filteredAdmins.length);
 
     const handleLeftButton = () => {
         setCurrentPage((prev) => Math.max(prev - 1, 1));
@@ -72,28 +74,29 @@ function UserManagement() {
         });
     };
 
-    const getInitials = (name = "") =>
-        name
-            .split(" ")
-            .filter(Boolean)
-            .slice(0, 2)
-            .map((part) => part[0]?.toUpperCase())
-            .join("");
+    const handleAddAdmin = () => {
+        navigate("/admin/admins/add");
+    };
+
+    const handleEditAdmin = (adminId) => {
+        navigate(`/admin/admins/edit/${adminId}`);
+    };
 
     return (
         <main className="space-y-4">
-            <header className="flex flex-col gap-3">
+            <header className="flex items-center justify-between gap-3">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900">User management</h1>
-                    <p className="text-slate-500">Manage and monitor all registered students.</p>
+                    <h1 className="text-xl font-bold text-slate-900">Admin management</h1>
+                    <p className="text-xs text-slate-500">Manage all registered admins.</p>
                 </div>
 
                 <button
                     type="button"
-                    className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-indigo-600 px-3 py-2.5 text-sm text-white sm:gap-2 sm:px-4 sm:py-3 sm:text-base"
+                    className="flex cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-indigo-600 px-2.5 py-1.5 text-xs text-white"
+                    onClick={handleAddAdmin}
                 >
-                    <span className="text-base sm:text-lg">+</span>
-                    <span className="font-semibold">Add student</span>
+                    <span className="text-sm">+</span>
+                    <span className="font-semibold">Add admin</span>
                 </button>
             </header>
 
@@ -105,8 +108,8 @@ function UserManagement() {
                         </span>
                         <input
                             type="text"
-                            placeholder="Search students by name"
-                            aria-label="Search students by name"
+                            placeholder="Search admins by name"
+                            aria-label="Search admins by name"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             className="w-full rounded-2xl border border-slate-200 py-2.5 pl-11 pr-4 outline-none placeholder:text-slate-400"
@@ -115,7 +118,7 @@ function UserManagement() {
 
                     <button
                         type="button"
-                        className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 py-2.5 text-sm font-semibold text-slate-700"
+                        className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-200 py-2.5 text-sm font-semibold text-slate-700"
                     >
                         <i className="fa-solid fa-filter" />
                         <span>Filter</span>
@@ -125,63 +128,55 @@ function UserManagement() {
                 <div className="mt-4 space-y-3">
                     {loading ? (
                         <p className="py-6 text-center text-sm text-slate-500">Loading...</p>
-                    ) : currentStudents.length > 0 ? (
-                        currentStudents.map((student) => (
+                    ) : currentAdmins.length > 0 ? (
+                        currentAdmins.map((admin) => (
                             <article
-                                key={student.id}
+                                key={admin.id}
                                 className="rounded-2xl border border-slate-100 p-3 shadow-sm"
                             >
                                 <header className="flex items-start justify-between gap-3">
                                     <div className="flex min-w-0 items-start gap-3">
                                         <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-slate-100 font-semibold text-slate-700">
-                                            {getInitials(student.name)}
+                                            {`${admin.firstName?.charAt(0) || ""}${admin.lastName?.charAt(0) || ""}`}
                                         </div>
 
                                         <div className="min-w-0">
                                             <h2 className="truncate text-base font-semibold text-slate-900 sm:text-lg">
-                                                {student.name}
+                                                {admin.firstName} {admin.lastName}
                                             </h2>
                                             <p className="truncate text-xs text-slate-500 sm:text-sm">
-                                                {student.email || "student@email.com"}
+                                                {admin.email}
                                             </p>
                                         </div>
                                     </div>
 
                                     <span
-                                        className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold sm:px-3 sm:text-sm ${student.active
+                                        className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold sm:px-3 sm:text-sm ${
+                                            admin.active
                                                 ? "bg-green-100 text-green-700"
                                                 : "bg-slate-100 text-slate-500"
-                                            }`}
+                                        }`}
                                     >
-                                        {student.active ? "Active" : "Inactive"}
+                                        {admin.active ? "Active" : "Inactive"}
                                     </span>
                                 </header>
 
-                                <div className="mt-3 grid grid-cols-3 gap-2 border-t border-slate-100 pt-3">
+                                <div className="mt-3 grid grid-cols-2 gap-2 border-t border-slate-100 pt-3">
                                     <div className="min-w-0">
                                         <p className="text-[10px] uppercase tracking-wide text-slate-400 sm:text-xs">
-                                            Registered
+                                            Created
                                         </p>
                                         <p className="mt-1 truncate text-sm font-semibold text-slate-900 sm:text-base">
-                                            {formatDate(student.registrationDate)}
+                                            {formatDate(admin.created_at)}
                                         </p>
                                     </div>
 
                                     <div className="min-w-0">
                                         <p className="text-[10px] uppercase tracking-wide text-slate-400 sm:text-xs">
-                                            Attempted
+                                            Updated
                                         </p>
                                         <p className="mt-1 truncate text-sm font-semibold text-slate-900 sm:text-base">
-                                            {student.quizzesAttempted ?? 0}
-                                        </p>
-                                    </div>
-
-                                    <div className="min-w-0">
-                                        <p className="text-[10px] uppercase tracking-wide text-slate-400 sm:text-xs">
-                                            Avg. score
-                                        </p>
-                                        <p className="mt-1 truncate text-sm font-semibold text-green-600 sm:text-base">
-                                            {student.averageScore ?? 0}%
+                                            {formatDate(admin.updated_at)}
                                         </p>
                                     </div>
                                 </div>
@@ -189,22 +184,23 @@ function UserManagement() {
                                 <footer className="mt-3 flex justify-end gap-2 border-t border-slate-100 pt-3">
                                     <button
                                         type="button"
-                                        className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 text-slate-600"
-                                        aria-label="View student"
+                                        className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl border border-slate-200 text-slate-600"
+                                        aria-label="View admin"
                                     >
                                         <i className="fa-regular fa-eye" />
                                     </button>
                                     <button
                                         type="button"
-                                        className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 text-slate-600"
-                                        aria-label="Edit student"
+                                        className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl border border-slate-200 text-slate-600"
+                                        aria-label="Edit admin"
+                                        onClick={() => handleEditAdmin(admin.id)}
                                     >
                                         <i className="fa-regular fa-pen-to-square" />
                                     </button>
                                     <button
                                         type="button"
-                                        className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 text-slate-600"
-                                        aria-label="Delete student"
+                                        className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl border border-slate-200 text-slate-600"
+                                        aria-label="Delete admin"
                                     >
                                         <i className="fa-regular fa-trash-can" />
                                     </button>
@@ -212,13 +208,13 @@ function UserManagement() {
                             </article>
                         ))
                     ) : (
-                        <p className="py-6 text-center text-sm text-slate-500">No students found.</p>
+                        <p className="py-6 text-center text-sm text-slate-500">No admins found.</p>
                     )}
                 </div>
 
                 <div className="mt-4 flex flex-col items-center gap-3 border-t border-slate-100 pt-4">
                     <p className="text-sm text-slate-500">
-                        Showing {showingStart}–{showingEnd} of {filteredStudents.length} students
+                        Showing {showingStart}–{showingEnd} of {filteredAdmins.length} admins
                     </p>
 
                     <div className="pagination">
@@ -252,4 +248,4 @@ function UserManagement() {
     );
 }
 
-export default UserManagement;
+export default AdminManagement;
