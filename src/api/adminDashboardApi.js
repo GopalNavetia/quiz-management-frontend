@@ -1,7 +1,7 @@
 import api from "./axiosInstance";
 
 export const getAdminDashboard = async () => {
-    const response = await api.get("/admin/dashboard"); 
+    const response = await api.get("/admin/dashboard");
     return response.data;
 };
 
@@ -21,12 +21,10 @@ export const getEditStudent = async (studentId) => {
     return response.data;
 }
 
-export const updateStudent= async (studentId, studentData) => {
+export const updateStudent = async (studentId, studentData) => {
     const response = await api.put(`/admin/users/updateStudent/${studentId}`, studentData);
     return response.data;
 }
-
-// Delete api pending
 
 // Admin Management API
 export const getAllAdmins = async () => {
@@ -46,5 +44,42 @@ export const getEditAdmin = async (adminId) => {
 
 export const updateAdmin = async (adminId, adminData) => {
     const response = await api.put(`/admin/adminsList/updateAdmin/${adminId}`, adminData);
+    return response.data;
+}
+
+// Category Management API
+export const getAllCategory = async () => {
+    const response = await api.get("/category/categoryList");
+    return response.data;
+}
+
+export const addCategory = async (categoryData) => {
+    const response = await api.post("/category/addCategory", categoryData);
+    return response.data;   
+}
+
+export const updateCategory = async (categoryId, categoryData) => {
+    const response = await api.put(`/category/categoryList/updateCategory/${categoryId}`, categoryData);
+    return response.data;
+}
+
+// Quiz Management API
+export const getAllQuizzes = async () => {
+    const response = await api.get("/quizzes/quizzesList");
+    return response.data;
+}
+
+export const addQuiz = async (quizData) => {
+    const response = await api.post("/quizzes/create", quizData);
+    return response.data;
+}
+
+export const getEditQuiz = async (quizId) => {
+    const response = await api.get(`/quizzes/quizzesList/getEditQuiz/${quizId}`);
+    return response.data;
+}
+
+export const updateQuiz = async (quizId, quizData) => {
+    const response = await api.put(`/quizzes/quizzesList/updateQuiz/${quizId}`, quizData);
     return response.data;
 }
