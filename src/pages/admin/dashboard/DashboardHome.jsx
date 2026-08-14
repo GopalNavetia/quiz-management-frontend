@@ -26,27 +26,36 @@ function DashboardHome() {
     }, []);
 
     return (
-        <>
-            {loading ? (
-                <div className="flex h-full items-center justify-center">
-                    <p className="text-lg font-medium text-gray-600">
-                        Loading dashboard...
-                    </p>
+        <main className="space-y-4">
+            <header className="flex items-center justify-between gap-3">
+                <div>
+                    <h1 className="text-xl font-bold text-slate-900">Overview & Analytics</h1>
+                    <p className="text-xs text-slate-500">Real-time quiz statistics and student progress overview.</p>
                 </div>
-            ) : (
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                    <AdminDashboardCard icon="fa-regular fa-user" data={dashboard.totalStudents} title="Total students" />
-                    <AdminDashboardCard icon="fa-regular fa-file-lines" data={dashboard.totalQuizzes} title="Total quizzes" />
-                    <AdminDashboardCard icon="fa-regular fa-circle-check" data={dashboard.publishedQuizzes} title="Published quizzes" />
-                    <AdminDashboardCard icon="fa-regular fa-pen-to-square" data={dashboard.draftQuizzes} title="Draft quizzes" />
-                    <AdminDashboardCard icon="fa-regular fa-circle-question" data={dashboard.totalQuestions} title="Total questions" />
-                    <AdminDashboardCard icon="fa-solid fa-wave-square" data={dashboard.totalQuizAttempts} title="Total quiz attempts" />
-                    <AdminDashboardCard icon="fa-solid fa-chart-simple" data={`${dashboard.averageScore}%`} title="Average score" />
-                    <AdminDashboardCard icon="fa-solid fa-check" data={dashboard.passedAttempts} title="Total passed attempts" />
-                    <AdminDashboardCard icon="fa-solid fa-xmark" data={dashboard.failedAttempts} title="Total failed attempts" />
-                </div>
-            )}
-        </>
+            </header>
+
+            <section className="rounded-2xl border bg-white p-3 shadow-sm">
+                {loading ? (
+                    <div className="flex h-full items-center justify-center">
+                        <p className="text-lg font-medium text-gray-600">
+                            Loading dashboard...
+                        </p>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                        <AdminDashboardCard icon="fa-regular fa-user" data={dashboard.totalStudents} title="Total students" />
+                        <AdminDashboardCard icon="fa-regular fa-file-lines" data={dashboard.totalQuizzes} title="Total quizzes" />
+                        <AdminDashboardCard icon="fa-regular fa-circle-check" data={dashboard.publishedQuizzes} title="Published quizzes" />
+                        <AdminDashboardCard icon="fa-regular fa-pen-to-square" data={dashboard.draftQuizzes} title="Draft quizzes" />
+                        <AdminDashboardCard icon="fa-regular fa-circle-question" data={dashboard.totalQuestions} title="Total questions" />
+                        <AdminDashboardCard icon="fa-solid fa-wave-square" data={dashboard.totalQuizAttempts} title="Total quiz attempts" />
+                        <AdminDashboardCard icon="fa-solid fa-chart-simple" data={`${dashboard.averageScore}%`} title="Average score" />
+                        <AdminDashboardCard icon="fa-solid fa-check" data={dashboard.passedAttempts} title="Total passed attempts" />
+                        <AdminDashboardCard icon="fa-solid fa-xmark" data={dashboard.failedAttempts} title="Total failed attempts" />
+                    </div>
+                )}
+            </section>
+        </main>
     );
 }
 

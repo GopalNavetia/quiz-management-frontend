@@ -5,34 +5,34 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import StudentDashboard from "./pages/student/StudentDashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 
+const router = createBrowserRouter([
+    {
+        path: "/",
+        element: <AuthPage />
+    },
+
+    {
+        element: <ProtectedRoute role="ADMIN" />,
+        children: [
+            {
+                path: "/admin/*",
+                element: <AdminDashboard />
+            }
+        ]
+    },
+
+    {
+        element: <ProtectedRoute role="STUDENT" />,
+        children: [
+            {
+                path: "/student/*",
+                element: <StudentDashboard />
+            }
+        ]
+    }
+]);
+
 function App() {
-
-    const router = createBrowserRouter([
-        {
-            path: "/",
-            element: <AuthPage />
-        },
-
-        {
-            element: <ProtectedRoute role="ADMIN" />,
-            children: [
-                {
-                    path: "/admin/*",
-                    element: <AdminDashboard />
-                }
-            ]
-        },
-
-        {
-            element: <ProtectedRoute role="STUDENT" />,
-            children: [
-                {
-                    path: "/student/*",
-                    element: <StudentDashboard />
-                }
-            ]
-        }
-    ]);
 
     return <RouterProvider router={router} />;
 }

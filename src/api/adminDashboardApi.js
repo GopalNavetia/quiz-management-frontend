@@ -83,3 +83,24 @@ export const updateQuiz = async (quizId, quizData) => {
     const response = await api.put(`/quizzes/quizzesList/updateQuiz/${quizId}`, quizData);
     return response.data;
 }
+
+// Question Management API
+export const getAllQuestions = async (quizId) => {
+    const response = await api.get(`/question/questionList/${quizId}`);
+    return response.data;
+}
+
+export const addQuestion = async (QuestionData) => {
+    const response = await api.post("/question/addQuestion", QuestionData);
+    return response.data;
+}
+
+export const getEditQuestion = async (quizId, questionId) => {
+    const response = await api.get(`/question/questionList/${quizId}/getEditQuestion/${questionId}`);
+    return response.data;
+}
+
+export const updateQuestion = async (quizId,questionId,questionData) => {
+    const response = await api.put(`/question/questionList/${quizId}/updateQuestion/${questionId}`, questionData);
+    return response.data;
+}

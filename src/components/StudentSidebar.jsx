@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
-function Sidebar({sidebarOpen,setSidebarOpen}) {
+function StudentSidebar({sidebarOpen,setSidebarOpen}) {
     const [showLabels, setShowLabels] = useState(true);
     const navigate = useNavigate();
     const location = useLocation();
@@ -26,22 +26,22 @@ function Sidebar({sidebarOpen,setSidebarOpen}) {
         {
             label: "Dashboard",
             icon: "fa-solid fa-table-cells-large",
-            path: "/admin/dashboard"
-        },
-        {
-            label: "User Management",
-            icon: "fa-solid fa-users",
-            path: "/admin/users"
+            path: "/student/dashboard"
         },
         {
             label: "Quizzes",
             icon: "fa-regular fa-file-lines",
-            path: "/admin/quizzes"
+            path: "/student/quizzes"
+        },
+        {
+            label: "History",
+            icon: "fa-solid fa-clock-rotate-left",
+            path: "/student/history"
         },
         {
             label: "Leaderboard",
             icon: "fa-regular fa-chart-bar",
-            path: "/admin/leaderboard"
+            path: "/student/leaderboard"
         }
     ];
 
@@ -86,4 +86,4 @@ function Sidebar({sidebarOpen,setSidebarOpen}) {
     );
 }
 
-export default Sidebar;
+export default StudentSidebar;

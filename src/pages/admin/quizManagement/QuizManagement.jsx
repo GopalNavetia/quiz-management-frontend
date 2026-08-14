@@ -110,6 +110,10 @@ function QuizManagement() {
         navigate(`/admin/quizzes/edit/${quizId}`);
     };
 
+    const handleViewQuestions = (quizId) => {
+        navigate(`/admin/quizzes/${quizId}/questions`);
+    }
+
     return (
         <main className="space-y-4">
             <header className="flex items-center justify-between gap-3">
@@ -212,6 +216,7 @@ function QuizManagement() {
                                         type="button"
                                         className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl border border-slate-200 text-slate-600"
                                         aria-label="View quiz"
+                                        onClick={() => handleViewQuestions(quiz.id)}
                                     >
                                         <i className="fa-regular fa-eye" />
                                     </button>

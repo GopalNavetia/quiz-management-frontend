@@ -2,7 +2,7 @@ import { useState } from "react";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import { useNavigate } from "react-router-dom";
 
-function Navbar() {
+function StudentNavbar({ setSidebarOpen }) {
     const [menuOpen, setMenuOpen] = useState(false);
     const navigate = useNavigate();
 
@@ -11,30 +11,44 @@ function Navbar() {
         localStorage.removeItem("role");
         localStorage.removeItem("firstName");
         localStorage.removeItem("lastName");
-        
-        navigate("/"); 
+
+        navigate("/");
     }
 
-    const handleManageAdminButton = () => {
+    const handleManageStudentButton = () => {
         setMenuOpen(false);
-        navigate("/admin/admins");
+        navigate("/student/profile");
     }
 
     return (
-        <nav className="flex items-center justify-between bg-black px-4 py-2 text-white shadow-md">
+        <nav className="flex items-center justify-between bg-black px-2 py-2 text-white shadow-md">
             {/* Left side */}
-            <div className="flex items-center gap-3 cursor-default">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-600 text-xl font-bold sm:h-12 sm:w-12 sm:text-2xl sm:pb-1 cursor-default">
-                    Q
+            <div className={"flex items center"}>
+                <div className="flex items-center justify-between px-1 py-4 pr-2">
+                    <button
+                        type="button"
+                        onClick={() => setSidebarOpen((prev) => !prev)}
+                        className="cursor-pointer text-white"
+                        aria-label="Toggle sidebar"
+                    >
+                        <i className="fa-solid fa-sliders text-xl text-white" />
+                    </button>
                 </div>
 
-                <div className="leading-tight cursor-default">
-                    <h1 className="text-lg font-bold sm:text-2xl cursor-default">Admin Dashboard</h1>
-                    <p className="text-xs text-gray-300 sm:block sm:text-sm cursor-default">
-                        Quiz Management System
-                    </p>
+                <div className="flex items-center gap-3 cursor-default">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-600 text-xl font-bold sm:h-12 sm:w-12 sm:text-2xl sm:pb-1 cursor-default">
+                        Q
+                    </div>
+
+                    <div className="leading-tight cursor-default">
+                        <h1 className="text-lg font-bold sm:text-2xl cursor-default">Student Dashboard</h1>
+                        <p className="text-xs text-gray-300 sm:block sm:text-sm cursor-default">
+                            Quiz Management System
+                        </p>
+                    </div>
                 </div>
             </div>
+
 
             {/* Right side */}
             <div className="relative">
@@ -51,7 +65,7 @@ function Navbar() {
 
                     <div className="hidden leading-tight text-left sm:block">
                         <h2 className="text-base font-semibold sm:text-lg">{localStorage.getItem("firstName")} {localStorage.getItem("lastName")}</h2>
-                        <p className="text-xs text-gray-300 sm:text-sm">Administrator</p>
+                        <p className="text-xs text-gray-300 sm:text-sm">Student</p>
                     </div>
 
                     <span
@@ -66,12 +80,12 @@ function Navbar() {
                         <button
                             type="button"
                             className="flex w-full cursor-pointer items-center gap-3 rounded-xl px-4 py-1 text-left text-base transition-colors hover:bg-gray-100"
-                            onClick={handleManageAdminButton}
+                            onClick={handleManageStudentButton}
                         >
                             <span className="text-sm text-gray-500">
                                 <i className="fa-solid fa-gear" />
                             </span>
-                            <span>Manage admin</span>
+                            <span>My Profile</span>
                         </button>
 
                         <div className="my-1 border-t border-gray-200" />
@@ -91,4 +105,4 @@ function Navbar() {
     );
 }
 
-export default Navbar;
+export default StudentNavbar;
