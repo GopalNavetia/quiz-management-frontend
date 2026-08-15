@@ -10,6 +10,7 @@ import History from "./history/History";
 
 import Leaderboard from "../../components/Leaderboard";
 import AttemptQuizWindow from "./quiz/attemptQuiz/AttemptQuizWindow";
+import ReviewQuiz from "./quiz/reviewQuiz/ReviewQuiz";
 
 function StudentDashboard() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -25,6 +26,8 @@ function StudentDashboard() {
                         <Route path="dashboard" element={<DashboardHome />} />
 
                         <Route path="quizzes" element={<Quiz />} />
+                        <Route path="quizzes/:quizId" element={<AttemptQuizWindow />} />
+                        <Route path="quizzes/:quizId/reviewPage" element={<ReviewQuiz />} />
 
                         <Route path="history" element={<History />} />
 

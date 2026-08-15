@@ -1,41 +1,6 @@
 import { useEffect, useState } from "react";
-// import { useParams } from "react-router-dom";
-// import { getQuizQuestions } from "../../../api/studentDashboardApi";
-//
-// const { quizId } = useParams();
-// const [questions, setQuestions] = useState([]);
-// const [loading, setLoading] = useState(true);
-//
-// const fetchQuestions = async () => {
-//     try {
-//         setLoading(true);
-//         const response = await getQuizQuestions(quizId);
-//         setQuestions(response?.data ?? response ?? []);
-//     } catch (error) {
-//         alert(error.response?.data || "Failed to load quiz questions");
-//         setQuestions([]);
-//     } finally {
-//         setLoading(false);
-//     }
-// };
-//
-// useEffect(() => {
-//     fetchQuestions();
-// }, [quizId]);
-
-const quizTitle = "JavaScript Fundamentals";
-const totalTimeInSeconds = 20 * 60; 
-
-const dummyQuestions = [
-    { id: 1, text: "Which symbol is used for strict equality in JavaScript?", options: ["=", "==", "===", "!=="] },
-    { id: 2, text: "Which method adds an item to the end of an array?", options: ["push()", "pop()", "shift()", "unshift()"] },
-    { id: 3, text: "Which keyword declares a constant?", options: ["var", "let", "const", "static"] },
-    { id: 4, text: "What does 'NaN' stand for?", options: ["Not a Number", "New and Null", "Null and None", "Number and Null"] },
-    { id: 5, text: "Which method converts a JSON string into a JS object?", options: ["JSON.parse()", "JSON.stringify()", "JSON.convert()", "JSON.toObject()"] },
-    { id: 6, text: "Which keyword is used to create a function?", options: ["func", "def", "function", "lambda"] },
-    { id: 7, text: "What is the output of typeof null?", options: ["'null'", "'object'", "'undefined'", "'number'"] },
-    { id: 8, text: "Which array method creates a new array with results of calling a function?", options: ["forEach()", "map()", "filter()", "reduce()"] }
-];
+import { useParams, useNavigate } from "react-router-dom";
+import { getQuizQuestions, submitQuiz } from "../../../../api/studentDashboardApi";
 
 function formatTime(totalSeconds) {
     const minutes = Math.floor(totalSeconds / 60);
@@ -44,32 +9,69 @@ function formatTime(totalSeconds) {
     return `${minutes}:${paddedSeconds}`;
 }
 
+// converts optionA-D fields on a question into a simple options array
+function mapQuestion(question) {
+    return {
+        id: question.questionId,
+        text: question.questionText,
+        marks: question.marks,
+        difficulty: question.difficulty,
+        options: [
+            { key: "optionA", label: question.optionA },
+            { key: "optionB", label: question.optionB },
+            { key: "optionC", label: question.optionC },
+            { key: "optionD", label: question.optionD }
+        ]
+    };
+}
+
 function AttemptQuizWindow() {
-    const questions = dummyQuestions;
+    const { quizId } = useParams();
+    const navigate = useNavigate();
+
+    const [quizTitle, setQuizTitle] = useState("");
+    const [totalTimeInSeconds, setTotalTimeInSeconds] = useState(0);
+    const [questions, setQuestions] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     const [currentIndex, setCurrentIndex] = useState(0);
     const [selectedAnswers, setSelectedAnswers] = useState({});
-    const [timeLeft, setTimeLeft] = useState(totalTimeInSeconds);
     const [showPalette, setShowPalette] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
 
-    // countdown timer - ticks down every second
+    const fetchQuestions = async () => {
+        try {
+            setLoading(true);
+            const response = await getQuizQuestions(quizId);
+            const data = response?.data ?? response ?? {};
+
+            setQuizTitle(data.title ?? "Quiz");
+            // duration comes in minutes from the API; timer is static for now
+            setTotalTimeInSeconds((data.duration ?? 0) * 60);
+            setQuestions((data.questions ?? []).map(mapQuestion));
+            setCurrentIndex(0);
+            setSelectedAnswers({});
+        } catch (error) {
+            alert(error.response?.data || "Failed to load quiz questions");
+            setQuizTitle("");
+            setTotalTimeInSeconds(0);
+            setQuestions([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
-        if (timeLeft <= 0) return;
-
-        const timerId = setInterval(() => {
-            setTimeLeft((prev) => prev - 1);
-        }, 1000);
-
-        return () => clearInterval(timerId);
-    }, [timeLeft]);
+        fetchQuestions();
+    }, [quizId]);
 
     const currentQuestion = questions[currentIndex];
     const totalQuestions = questions.length;
 
-    const handleSelectOption = (questionId, option) => {
+    const handleSelectOption = (questionId, optionKey) => {
         setSelectedAnswers((prev) => ({
             ...prev,
-            [questionId]: option
+            [questionId]: optionKey
         }));
     };
 
@@ -86,14 +88,35 @@ function AttemptQuizWindow() {
         setShowPalette(false);
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         const answeredCount = Object.keys(selectedAnswers).length;
         const confirmSubmit = window.confirm(
             `You have answered ${answeredCount} of ${totalQuestions} questions. Submit quiz now?`
         );
 
-        if (confirmSubmit) {
-            alert("Quiz submitted!");
+        if (!confirmSubmit) return;
+
+        const attemptId = localStorage.getItem("attemptId");
+
+        const answers = Object.entries(selectedAnswers).map(([questionId, optionKey]) => ({
+            questionId: Number(questionId),
+            selectedOption: optionKey.replace("option", "")
+        }));
+
+        const submitData = {
+            attemptId: attemptId ? Number(attemptId) : null,
+            answers
+        };
+
+        try {
+            setSubmitting(true);
+            console.log("Submitting quiz with data:", submitData);
+            await submitQuiz(submitData);
+            navigate("reviewPage");
+        } catch (error) {
+            alert(error.response?.data || "Failed to submit quiz");
+        } finally {
+            setSubmitting(false);
         }
     };
 
@@ -106,6 +129,14 @@ function AttemptQuizWindow() {
         }
         return "border border-slate-300 bg-white text-slate-600";
     };
+
+    if (loading) {
+        return (
+            <main className="space-y-4">
+                <p className="text-center text-sm text-slate-500">Loading quiz...</p>
+            </main>
+        );
+    }
 
     if (!currentQuestion) {
         return (
@@ -126,9 +157,10 @@ function AttemptQuizWindow() {
                         </p>
                     </div>
 
+                    {/* timer is static for now, not counting down */}
                     <div className="flex shrink-0 items-center gap-1.5 rounded-full bg-rose-50 px-3 py-1.5 text-sm font-semibold text-rose-600">
                         <i className="fa-regular fa-clock" />
-                        <span>{formatTime(timeLeft)}</span>
+                        <span>{formatTime(totalTimeInSeconds)}</span>
                     </div>
                 </div>
 
@@ -194,13 +226,13 @@ function AttemptQuizWindow() {
 
                 <div className="mt-4 space-y-2.5">
                     {currentQuestion.options.map((option) => {
-                        const isSelected = selectedAnswers[currentQuestion.id] === option;
+                        const isSelected = selectedAnswers[currentQuestion.id] === option.key;
 
                         return (
                             <button
-                                key={option}
+                                key={option.key}
                                 type="button"
-                                onClick={() => handleSelectOption(currentQuestion.id, option)}
+                                onClick={() => handleSelectOption(currentQuestion.id, option.key)}
                                 className={`flex w-full items-center gap-3 rounded-xl border px-4 py-3 text-left text-sm ${
                                     isSelected
                                         ? "border-indigo-600 bg-indigo-50 text-indigo-700"
@@ -214,7 +246,7 @@ function AttemptQuizWindow() {
                                 >
                                     {isSelected && <span className="h-2 w-2 rounded-full bg-indigo-600" />}
                                 </span>
-                                <span>{option}</span>
+                                <span>{option.label}</span>
                             </button>
                         );
                     })}
@@ -248,10 +280,11 @@ function AttemptQuizWindow() {
             <button
                 type="button"
                 onClick={handleSubmit}
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 py-3 text-sm font-semibold text-white hover:bg-indigo-700"
+                disabled={submitting}
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 py-3 text-sm font-semibold text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
             >
                 <i className="fa-solid fa-paper-plane" />
-                Submit Quiz
+                {submitting ? "Submitting..." : "Submit Quiz"}
             </button>
         </main>
     );

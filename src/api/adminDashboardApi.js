@@ -65,42 +65,42 @@ export const updateCategory = async (categoryId, categoryData) => {
 
 // Quiz Management API
 export const getAllQuizzes = async () => {
-    const response = await api.get("/quizzes/quizzesList");
+    const response = await api.get("/admin/quizzes/quizzesList");
     return response.data;
 }
 
 export const addQuiz = async (quizData) => {
-    const response = await api.post("/quizzes/create", quizData);
+    const response = await api.post("/admin/quizzes/create", quizData);
     return response.data;
 }
 
 export const getEditQuiz = async (quizId) => {
-    const response = await api.get(`/quizzes/quizzesList/getEditQuiz/${quizId}`);
+    const response = await api.get(`/admin/quizzes/quizzesList/getEditQuiz/${quizId}`);
     return response.data;
 }
 
 export const updateQuiz = async (quizId, quizData) => {
-    const response = await api.put(`/quizzes/quizzesList/updateQuiz/${quizId}`, quizData);
+    const response = await api.put(`/admin/quizzes/quizzesList/updateQuiz/${quizId}`, quizData);
     return response.data;
 }
 
 // Question Management API
 export const getAllQuestions = async (quizId) => {
-    const response = await api.get(`/question/questionList/${quizId}`);
+    const response = await api.get(`/admin/question/questionList/${quizId}`);
     return response.data;
 }
 
 export const addQuestion = async (QuestionData) => {
-    const response = await api.post("/question/addQuestion", QuestionData);
+    const response = await api.post("/admin/question/addQuestion", QuestionData);
     return response.data;
 }
 
 export const getEditQuestion = async (quizId, questionId) => {
-    const response = await api.get(`/question/questionList/${quizId}/getEditQuestion/${questionId}`);
+    const response = await api.get(`/admin/question/questionList/${quizId}/getEditQuestion/${questionId}`);
     return response.data;
 }
 
 export const updateQuestion = async (quizId,questionId,questionData) => {
-    const response = await api.put(`/question/questionList/${quizId}/updateQuestion/${questionId}`, questionData);
+    const response = await api.put(`/admin/question/questionList/${quizId}/updateQuestion/${questionId}`, questionData);
     return response.data;
 }
