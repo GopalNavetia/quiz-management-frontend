@@ -110,9 +110,13 @@ function AttemptQuizWindow() {
 
         try {
             setSubmitting(true);
-            console.log("Submitting quiz with data:", submitData);
             await submitQuiz(submitData);
-            navigate("reviewPage");
+            
+            // Clear attemptId from localStorage after successful submission
+            localStorage.removeItem("attemptId");
+
+            const targetAttemptId = attemptId || "";
+            navigate(`/student/quizzes/${quizId}/reviewPage/${targetAttemptId}`, { replace: true });
         } catch (error) {
             alert(error.response?.data || "Failed to submit quiz");
         } finally {

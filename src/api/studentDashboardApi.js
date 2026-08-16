@@ -1,5 +1,11 @@
 import api from "./axiosInstance";
 
+//Student Dashboard API
+export const getStudentDashboard = async () => {
+    const response = await api.get("/student/dashboard");
+    return response.data;
+}
+
 // Student Quiz API
 export const getStudentQuizzes = async () => {
     const response = await api.get("/student/quizzes");
@@ -23,5 +29,10 @@ export const submitQuiz = async (submitData) => {
 
 export const getQuizReview = async (attemptId) => {
     const response = await api.get(`student/review/${attemptId}`);
+    return response.data;
+}
+
+export const getQuizHistory = async () => {
+    const response = await api.get(`/student/quizHistory`);
     return response.data;
 }

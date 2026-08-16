@@ -27,14 +27,11 @@ function StudentDashboard() {
 
                         <Route path="quizzes" element={<Quiz />} />
                         <Route path="quizzes/:quizId" element={<AttemptQuizWindow />} />
-                        <Route path="quizzes/:quizId/reviewPage" element={<ReviewQuiz />} />
+                        <Route path="quizzes/:quizId/reviewPage/:attemptId" element={<ReviewQuiz />} />
 
                         <Route path="history" element={<History />} />
 
                         <Route path="leaderboard" element={<Leaderboard />} />
-
-                        {/* <Route path="users/add" element={<AddStudent />} /> */}
-                        {/* <Route path="users/edit/:studentId" element={<EditStudent />} /> */}
 
                     </Routes>
                 </div>
