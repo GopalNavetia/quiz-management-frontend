@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { getQuizReview } from "../../../../api/studentDashboardApi";
+import { getReviewAdmin } from "../../../../api/adminDashboardApi";
 
 const optionKeys = ["A", "B", "C", "D"];
 
@@ -22,24 +23,38 @@ function getOptionStyle(question, key) {
 }
 
 function ReviewQuiz() {
-    // ✅ Extract attemptId at the top level of the component
-    const { attemptId } = useParams();
+
+    const { attemptId, studentId } = useParams();
+    const navigate = useNavigate();
 
     const [review, setReview] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     useEffect(() => {
+        const currentRole = localStorage.getItem("role");
+
         const fetchReview = async () => {
             if (!attemptId) {
-                setError("No attempt found. Please attempt the quiz first.");
+                setError("No attempt found.");
+                setLoading(false);
+                return;
+            }
+
+            if (currentRole !== "STUDENT" && !studentId) {
+                setError("No student found.");
                 setLoading(false);
                 return;
             }
 
             try {
                 setLoading(true);
-                const response = await getQuizReview(attemptId);
+
+                const response =
+                    currentRole === "STUDENT"
+                        ? await getQuizReview(attemptId)
+                        : await getReviewAdmin(studentId, attemptId);
+
                 setReview(response?.data ?? response ?? null);
             } catch (err) {
                 setError(err.response?.data || "Failed to load quiz review");
@@ -50,7 +65,7 @@ function ReviewQuiz() {
         };
 
         fetchReview();
-    }, [attemptId]);
+    }, [attemptId, studentId]);
 
     if (loading) {
         return (
@@ -64,6 +79,15 @@ function ReviewQuiz() {
         return (
             <main className="space-y-4">
                 <p className="text-center text-sm text-rose-600">{error}</p>
+                <div className="flex justify-center">
+                    <button
+                        onClick={() => navigate(-1)}
+                        className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50"
+                    >
+                        <i className="fa-solid fa-arrow-left" />
+                        Back
+                    </button>
+                </div>
             </main>
         );
     }
@@ -72,6 +96,15 @@ function ReviewQuiz() {
         return (
             <main className="space-y-4">
                 <p className="text-center text-sm text-slate-500">No review data found.</p>
+                <div className="flex justify-center">
+                    <button
+                        onClick={() => navigate(-1)}
+                        className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm hover:bg-slate-50"
+                    >
+                        <i className="fa-solid fa-arrow-left" />
+                        Back
+                    </button>
+                </div>
             </main>
         );
     }
@@ -159,6 +192,17 @@ function ReviewQuiz() {
                     </div>
                 ))}
             </section>
+
+            {/* Back button */}
+            <div className="flex justify-center pt-2">
+                <button
+                    onClick={() => navigate(-1)}
+                    className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
+                >
+                    <i className="fa-solid fa-arrow-left" />
+                    Back
+                </button>
+            </div>
         </main>
     );
 }

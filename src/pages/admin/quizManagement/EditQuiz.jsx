@@ -4,7 +4,7 @@ import { getEditQuiz, updateQuiz } from "../../../api/adminDashboardApi";
 import CategoryDropdown from "./categoryManagement/CategoryDropdown";
 
 function EditQuiz() {
-   const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const [loadingQuiz, setLoadingQuiz] = useState(true);
     const navigate = useNavigate();
     const { quizId } = useParams();
@@ -163,6 +163,8 @@ function EditQuiz() {
         }));
     };
 
+
+
     if (loadingQuiz) {
         return <p className="py-6 text-center text-sm text-slate-500">Loading...</p>;
     }
@@ -219,8 +221,9 @@ function EditQuiz() {
                                     navigate(`/admin/quizzes/add/editCategory/${category.id}`);
                                 }}
                                 onDeleteCategory={(category) => {
-                                    // optional: wire delete modal/api when ready
-                                    console.log("Delete category:", category);
+                                    if (String(quizData.categoryId) === String(category.id)) {
+                                        setQuizData((prev) => ({ ...prev, categoryId: "" }));
+                                    }
                                 }}
                             />
                         </div>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getAllAdmins } from "../../../api/adminDashboardApi";
+import { getAllAdmins, deleteAdmin } from "../../../api/adminDashboardApi";
 
 function AdminManagement() {
     const navigate = useNavigate();
@@ -82,6 +82,19 @@ function AdminManagement() {
         navigate(`/admin/admins/edit/${adminId}`);
     };
 
+    const handleDeleteAdmin = async (adminId, adminName) => {
+        const ok = window.confirm(`Are you sure you want to delete admin: "${adminName}"?`);
+
+        if (!ok) return;
+
+        try {
+            await deleteAdmin(adminId);
+            setFetchData((prev) => prev.filter((admin) => admin.id !== adminId));
+        } catch (error) {
+            alert(error.response?.data || "Admin Deletion Failed");
+        }
+    }
+
     return (
         <main className="space-y-4">
             <header className="flex items-center justify-between gap-3">
@@ -115,14 +128,6 @@ function AdminManagement() {
                             className="w-full rounded-2xl border border-slate-200 py-2.5 pl-11 pr-4 outline-none placeholder:text-slate-400"
                         />
                     </div>
-
-                    <button
-                        type="button"
-                        className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-200 py-2.5 text-sm font-semibold text-slate-700"
-                    >
-                        <i className="fa-solid fa-filter" />
-                        <span>Filter</span>
-                    </button>
                 </div>
 
                 <div className="mt-4 space-y-3">
@@ -151,11 +156,10 @@ function AdminManagement() {
                                     </div>
 
                                     <span
-                                        className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold sm:px-3 sm:text-sm ${
-                                            admin.active
+                                        className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold sm:px-3 sm:text-sm ${admin.active
                                                 ? "bg-green-100 text-green-700"
                                                 : "bg-slate-100 text-slate-500"
-                                        }`}
+                                            }`}
                                     >
                                         {admin.active ? "Active" : "Inactive"}
                                     </span>
@@ -185,13 +189,6 @@ function AdminManagement() {
                                     <button
                                         type="button"
                                         className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl border border-slate-200 text-slate-600"
-                                        aria-label="View admin"
-                                    >
-                                        <i className="fa-regular fa-eye" />
-                                    </button>
-                                    <button
-                                        type="button"
-                                        className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl border border-slate-200 text-slate-600"
                                         aria-label="Edit admin"
                                         onClick={() => handleEditAdmin(admin.id)}
                                     >
@@ -201,6 +198,7 @@ function AdminManagement() {
                                         type="button"
                                         className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl border border-slate-200 text-slate-600"
                                         aria-label="Delete admin"
+                                        onClick={() => handleDeleteAdmin(admin.id, `${admin.firstName} ${admin.lastName}`)}
                                     >
                                         <i className="fa-regular fa-trash-can" />
                                     </button>

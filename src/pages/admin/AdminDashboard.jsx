@@ -19,6 +19,9 @@ import QuestionManagement from "./quizManagement/questionManagement/QuestionMana
 import AddQuestion from "./quizManagement/questionManagement/AddQuestion";
 import EditQuestion from "./quizManagement/questionManagement/EditQuestion";
 import Leaderboard from "../../components/Leaderboard";
+import History from ".././student/history/History";
+import Review from ".././student/quiz/reviewQuiz/ReviewQuiz"
+
 
 function AdminDashboard() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -35,6 +38,8 @@ function AdminDashboard() {
                         <Route path="dashboard" element={<DashboardHome />} />
 
                         <Route path="users" element={<UserManagement />} />
+                        <Route path="users/:studentId" element= {<History/>} />
+                        <Route path="users/:studentId/:attemptId" element= {<Review/>} />
                         <Route path="users/add" element={<AddStudent />} />
                         <Route path="users/edit/:studentId" element={<EditStudent />} />
 

@@ -61,6 +61,19 @@ function CategoryMaagement() {
 
     const handleEditCategory = (categoryId) => navigate(`/admin/categories/edit/${categoryId}`);
 
+    const handleDeleteCategory = (categoryId, categoryName) => {
+         const ok = window.confirm(`Are you sure you want to delete category: ${categoryName}?`);
+             
+                     if (!ok) return;
+             
+                     try {
+                         await deleteCategory(categoryId);
+                         setFetchData((prev) => prev.filter((category) => category.id !== categoryId));
+                     } catch (error) {
+                         alert(error.response?.data || "Category Deletion Failed");
+                     }
+    }
+
     // Auto icon by keyword matching in category name
     const getCategoryIcon = (name = "") => {
         const n = name.toLowerCase();
@@ -183,6 +196,7 @@ function CategoryMaagement() {
                                         type="button"
                                         className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl border border-slate-200 text-slate-600"
                                         aria-label="Delete category"
+                                        onClick={() => handleDeleteCategory(category.id, category.name)}
                                     >
                                         <i className="fa-regular fa-trash-can" />
                                     </button>

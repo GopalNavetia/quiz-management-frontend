@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getAllQuestions } from "../../../../api/adminDashboardApi"; 
+import { getAllQuestions,deleteQuestion } from "../../../../api/adminDashboardApi"; 
 
 function QuestionManagement() {
     const navigate = useNavigate();
@@ -88,6 +88,19 @@ function QuestionManagement() {
     const handleEditQuestion = (quesId) => {
         navigate(`${quesId}/editQuestion`);
     };
+
+    const handleDeleteQuestion= async (quesId) => {
+     const ok = window.confirm("Are you sure you want to delete question?");
+     
+             if (!ok) return;
+     
+             try {
+                 await deleteQuestion(quesId);
+                 setQuestions((prev) => prev.filter((ques) => ques.id !== quesId));
+             } catch (error) {
+                 alert(error.response?.data || "Question Deletion Failed");
+             }
+    }
 
     return (
         <main className="space-y-4">
@@ -199,6 +212,7 @@ function QuestionManagement() {
                                             type="button"
                                             className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50"
                                             aria-label="Delete question"
+                                            onClick={() => handleDeleteQuestion(q.id)}
                                         >
                                             <i className="fa-regular fa-trash-can" />
                                         </button>

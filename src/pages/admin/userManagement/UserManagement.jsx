@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getAllUsers } from "../../../api/adminDashboardApi";
+import { getAllUsers, deleteStudent } from "../../../api/adminDashboardApi";
 
 function UserManagement() {
     const navigate = useNavigate();
@@ -91,6 +91,23 @@ function UserManagement() {
         navigate(`/admin/users/edit/${studentId}`);
     }
 
+    const handleViewStudent = (userId)=>{
+        navigate(`/admin/users/${userId}`)
+    }
+
+    const handleDeleteStudent = async (studentId, studentName) => {
+    const ok = window.confirm(`Are you sure you want to delete user: "${studentName}"?`);
+
+    if (!ok) return;
+
+    try {
+        await deleteStudent(studentId);
+        setFetchData((prev) => prev.filter((student) => student.id !== studentId));
+    } catch (error) {
+        alert(error.response?.data || "User Deletion Failed");
+    }
+};
+
     return (
         <main className="space-y-4">
             <header className="flex items-center justify-between gap-3">
@@ -124,14 +141,6 @@ function UserManagement() {
                             className="w-full rounded-2xl border border-slate-200 py-2.5 pl-11 pr-4 outline-none placeholder:text-slate-400"
                         />
                     </div>
-
-                    <button
-                        type="button"
-                        className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-200 py-2.5 text-sm font-semibold text-slate-700"
-                    >
-                        <i className="fa-solid fa-filter" />
-                        <span>Filter</span>
-                    </button>
                 </div>
 
                 <div className="mt-4 space-y-3">
@@ -203,6 +212,7 @@ function UserManagement() {
                                         type="button"
                                         className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl border border-slate-200 text-slate-600"
                                         aria-label="View student"
+                                        onClick={()=>handleViewStudent(student.id)}
                                     >
                                         <i className="fa-regular fa-eye" />
                                     </button>
@@ -218,6 +228,7 @@ function UserManagement() {
                                         type="button"
                                         className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl border border-slate-200 text-slate-600"
                                         aria-label="Delete student"
+                                        onClick={() => handleDeleteStudent(student.id, student.name)}
                                     >
                                         <i className="fa-regular fa-trash-can" />
                                     </button>

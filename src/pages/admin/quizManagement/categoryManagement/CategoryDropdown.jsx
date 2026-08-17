@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getAllCategory } from "../../../../api/adminDashboardApi";
+import { getAllCategory, deleteCategory } from "../../../../api/adminDashboardApi";
 
 function CategoryDropdown({
     value,
@@ -13,20 +13,20 @@ function CategoryDropdown({
     const [isOpen, setIsOpen] = useState(false);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const fetchCategories = async () => {
-            try {
-                setLoading(true);
-                const response = await getAllCategory();
-                const data = response?.data ?? response ?? [];
-                setCategories(Array.isArray(data) ? data : []);
-            } catch (err) {
-                setCategories([]);
-            } finally {
-                setLoading(false);
-            }
-        };
+    const fetchCategories = async () => {
+        try {
+            setLoading(true);
+            const response = await getAllCategory();
+            const data = response?.data ?? response ?? [];
+            setCategories(Array.isArray(data) ? data : []);
+        } catch (err) {
+            setCategories([]);
+        } finally {
+            setLoading(false);
+        }
+    };
 
+    useEffect(() => {
         fetchCategories();
     }, []);
 
@@ -36,6 +36,19 @@ function CategoryDropdown({
     const handleSelect = (category) => {
         onChange?.(String(category.id));
         setIsOpen(false);
+    };
+
+    const handleDelete = async (category) => {
+        const ok = window.confirm(`Are you sure you want to delete category: ${category.name}?`);
+        if (!ok) return;
+
+        try {
+            await deleteCategory(category.id);
+            setCategories((prev) => prev.filter((c) => c.id !== category.id));
+            onDeleteCategory?.(category); 
+        } catch (error) {
+            alert(error.response?.data || "Category Deletion Failed");
+        }
     };
 
     return (
@@ -90,7 +103,7 @@ function CategoryDropdown({
                                             className="text-slate-500 hover:text-red-600"
                                             onClick={(e) => {
                                                 e.stopPropagation();
-                                                onDeleteCategory?.(category);
+                                                handleDelete(category);
                                             }}
                                         >
                                             <i className="fa-regular fa-trash-can" />

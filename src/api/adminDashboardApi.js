@@ -26,6 +26,21 @@ export const updateStudent = async (studentId, studentData) => {
     return response.data;
 }
 
+export const deleteStudent = async (studentId) => {
+    const response = await api.delete(`/admin/users/deleteStudent/${studentId}`);
+    return response.data;
+}
+
+export const getQuizHistoryAdmin = async (studentId)=>{
+    const response = await api.get(`/admin/quizHistory/${studentId}`);
+    return response.data;
+}
+
+export const getReviewAdmin= async (studentId,attemptId)=>{
+    const response=await api.get(`/admin/users/${studentId}/history/${attemptId}`);
+    return response.data;
+}
+
 // Admin Management API
 export const getAllAdmins = async () => {
     const response = await api.get("/admin/adminsList");
@@ -47,6 +62,11 @@ export const updateAdmin = async (adminId, adminData) => {
     return response.data;
 }
 
+export const deleteAdmin = async (adminId) => {
+    const response = await api.delete(`/admin/adminsList/deleteAdmin/${adminId}`);
+    return response.data;
+}
+
 // Category Management API
 export const getAllCategory = async () => {
     const response = await api.get("/category/categoryList");
@@ -60,6 +80,11 @@ export const addCategory = async (categoryData) => {
 
 export const updateCategory = async (categoryId, categoryData) => {
     const response = await api.put(`/category/categoryList/updateCategory/${categoryId}`, categoryData);
+    return response.data;
+}
+
+export const deleteCategory = async (categoryId) => {
+    const response = await api.delete(`/category/categoryList/deleteCategory/${categoryId}`);
     return response.data;
 }
 
@@ -84,6 +109,11 @@ export const updateQuiz = async (quizId, quizData) => {
     return response.data;
 }
 
+export const deleteQuiz = async (quizId)=>{
+    const response = await api.delete(`/admin/quizzes/deleteQuiz/${quizId}`);
+    return response.data;
+}
+
 // Question Management API
 export const getAllQuestions = async (quizId) => {
     const response = await api.get(`/admin/question/questionList/${quizId}`);
@@ -102,5 +132,10 @@ export const getEditQuestion = async (quizId, questionId) => {
 
 export const updateQuestion = async (quizId,questionId,questionData) => {
     const response = await api.put(`/admin/question/questionList/${quizId}/updateQuestion/${questionId}`, questionData);
+    return response.data;
+}
+
+export const deleteQuestion = async (quesId) => {
+    const response = await api.delete(`/admin/question/deleteQuestion/${quesId}`);
     return response.data;
 }

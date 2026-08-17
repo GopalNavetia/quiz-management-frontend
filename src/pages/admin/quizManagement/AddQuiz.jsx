@@ -205,8 +205,9 @@ function AddQuiz() {
                                     navigate(`/admin/quizzes/add/editCategory/${category.id}`);
                                 }}
                                 onDeleteCategory={(category) => {
-                                    // optional: wire delete modal/api when ready
-                                    console.log("Delete category:", category);
+                                    if (String(quizData.categoryId) === String(category.id)) {
+                                        setQuizData((prev) => ({ ...prev, categoryId: "" }));
+                                    }
                                 }}
                             />
                         </div>

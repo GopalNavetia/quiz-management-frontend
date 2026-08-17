@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { getAllQuizzes } from "../../../api/adminDashboardApi";
+import { getAllQuizzes, deleteQuiz } from "../../../api/adminDashboardApi";
 
 function QuizManagement() {
     const navigate = useNavigate();
@@ -10,6 +10,11 @@ function QuizManagement() {
 
     const [currentPage, setCurrentPage] = useState(1);
     const [searchQuery, setSearchQuery] = useState("");
+
+    const [showFilter, setShowFilter] = useState(false);
+    const [categoryFilter, setCategoryFilter] = useState("ALL");
+    const [statusFilter, setStatusFilter] = useState("ALL");
+    const [difficultyFilter, setDifficultyFilter] = useState("ALL");
 
     const quizzesPerPage = 5;
 
@@ -30,21 +35,41 @@ function QuizManagement() {
         getQuizzes();
     }, []);
 
+    const categories = useMemo(() => {
+        const unique = new Set(
+            fetchData
+                .map((quiz) => quiz.categoryName)
+                .filter((name) => !!name)
+        );
+        return Array.from(unique);
+    }, [fetchData]);
+
     const query = searchQuery.toLowerCase().trim();
 
-    const filteredQuizzes = query
-        ? fetchData.filter((quiz) =>
-            `${quiz.title || ""} ${quiz.categoryName || ""} ${quiz.difficulty || ""}`
-                .toLowerCase()
-                .includes(query)
-        )
-        : fetchData;
+    const filteredQuizzes = fetchData.filter((quiz) => {
+        const matchesQuery = query
+            ? `${quiz.title || ""} ${quiz.categoryName || ""} ${quiz.difficulty || ""}`
+                  .toLowerCase()
+                  .includes(query)
+            : true;
+
+        const matchesCategory =
+            categoryFilter === "ALL" || quiz.categoryName === categoryFilter;
+
+        const matchesStatus =
+            statusFilter === "ALL" || quiz.status === statusFilter;
+
+        const matchesDifficulty =
+            difficultyFilter === "ALL" || quiz.difficulty === difficultyFilter;
+
+        return matchesQuery && matchesCategory && matchesStatus && matchesDifficulty;
+    });
 
     const totalPages = Math.max(Math.ceil(filteredQuizzes.length / quizzesPerPage), 1);
 
     useEffect(() => {
         setCurrentPage(1);
-    }, [searchQuery]);
+    }, [searchQuery, categoryFilter, statusFilter, difficultyFilter]);
 
     useEffect(() => {
         if (currentPage > totalPages) {
@@ -114,6 +139,46 @@ function QuizManagement() {
         navigate(`/admin/quizzes/${quizId}/questions`);
     }
 
+    const handleDeleteQuiz= async (quizId)=>{
+        const ok = window.confirm("Are you sure you want to delete quiz?");
+
+        if (!ok) return;
+
+        try {
+            await deleteQuiz(quizId);
+            setFetchData((prev) => prev.filter((quiz) => quiz.id !== quizId));
+        } catch (error) {
+            alert(error.response?.data || "Quiz Deletion Failed");
+        }
+    }
+
+    const handleClearFilters = () => {
+        setSearchQuery("");
+        setCategoryFilter("ALL");
+        setStatusFilter("ALL");
+        setDifficultyFilter("ALL");
+    };
+
+    const hasActiveFilters =
+        searchQuery.trim() !== "" ||
+        categoryFilter !== "ALL" ||
+        statusFilter !== "ALL" ||
+        difficultyFilter !== "ALL";
+
+    const statusOptions = [
+        { value: "ALL", label: "All statuses" },
+        { value: "PUBLISHED", label: "Published" },
+        { value: "DRAFT", label: "Draft" },
+        { value: "UNPUBLISHED", label: "Unpublished" },
+    ];
+
+    const difficultyOptions = [
+        { value: "ALL", label: "All difficulties" },
+        { value: "BEGINNER", label: "Beginner" },
+        { value: "INTERMEDIATE", label: "Intermediate" },
+        { value: "ADVANCED", label: "Advanced" },
+    ];
+
     return (
         <main className="space-y-4">
             <header className="flex items-center justify-between gap-3">
@@ -151,10 +216,95 @@ function QuizManagement() {
                     <button
                         type="button"
                         className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-200 py-2.5 text-sm font-semibold text-slate-700"
+                        onClick={() => setShowFilter((prev) => !prev)}
+                        aria-expanded={showFilter}
                     >
                         <i className="fa-solid fa-filter" />
                         <span>Filter</span>
+                        <i
+                            className={`fa-solid fa-chevron-down text-xs text-slate-400 transition-transform ${
+                                showFilter ? "rotate-180" : ""
+                            }`}
+                        />
                     </button>
+
+                    {showFilter && (
+                        <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 space-y-3">
+                            <div>
+                                <label
+                                    htmlFor="category-filter"
+                                    className="mb-1 block text-xs font-semibold text-slate-600"
+                                >
+                                    Category
+                                </label>
+                                <select
+                                    id="category-filter"
+                                    value={categoryFilter}
+                                    onChange={(e) => setCategoryFilter(e.target.value)}
+                                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none"
+                                >
+                                    <option value="ALL">All categories</option>
+                                    {categories.map((category) => (
+                                        <option key={category} value={category}>
+                                            {category}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div>
+                                <label
+                                    htmlFor="status-filter"
+                                    className="mb-1 block text-xs font-semibold text-slate-600"
+                                >
+                                    Status
+                                </label>
+                                <select
+                                    id="status-filter"
+                                    value={statusFilter}
+                                    onChange={(e) => setStatusFilter(e.target.value)}
+                                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none"
+                                >
+                                    {statusOptions.map((option) => (
+                                        <option key={option.value} value={option.value}>
+                                            {option.label}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div>
+                                <label
+                                    htmlFor="difficulty-filter"
+                                    className="mb-1 block text-xs font-semibold text-slate-600"
+                                >
+                                    Difficulty
+                                </label>
+                                <select
+                                    id="difficulty-filter"
+                                    value={difficultyFilter}
+                                    onChange={(e) => setDifficultyFilter(e.target.value)}
+                                    className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none"
+                                >
+                                    {difficultyOptions.map((option) => (
+                                        <option key={option.value} value={option.value}>
+                                            {option.label}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            {hasActiveFilters && (
+                                <button
+                                    type="button"
+                                    onClick={handleClearFilters}
+                                    className="text-xs font-semibold text-indigo-600"
+                                >
+                                    Clear filters
+                                </button>
+                            )}
+                        </div>
+                    )}
                 </div>
 
                 <div className="mt-4 space-y-3">
@@ -232,6 +382,7 @@ function QuizManagement() {
                                         type="button"
                                         className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl border border-slate-200 text-slate-600"
                                         aria-label="Delete quiz"
+                                        onClick ={()=> handleDeleteQuiz(quiz.id)}
                                     >
                                         <i className="fa-regular fa-trash-can" />
                                     </button>

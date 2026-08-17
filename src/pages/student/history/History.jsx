@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,useParams } from "react-router-dom";
 import { getQuizHistory } from "../../../api/studentDashboardApi";
+import { getQuizHistoryAdmin } from "../../../api/adminDashboardApi";
 
 function formatDate(dateString) {
     const date = new Date(dateString);
@@ -49,8 +50,31 @@ function History() {
         }
     };
 
+    const { studentId } = useParams();
+
+    const adminFetchHistory = async () => {
+        try {
+            setLoading(true);
+            const response = await getQuizHistoryAdmin(studentId);
+            const data = response?.data ?? response ?? [];
+            setHistory(Array.isArray(data) ? data : []);
+        } catch (err) {
+            setError(err.response?.data || "Failed to load quiz history");
+            setHistory([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
-        fetchHistory();
+        const CURR_ROLE = localStorage.getItem("role");
+
+        if (CURR_ROLE === "STUDENT") {
+
+            fetchHistory();
+        } else {
+            adminFetchHistory();
+        }
     }, []);
 
     const totalPages = Math.max(Math.ceil(history.length / attemptsPerPage), 1);
@@ -66,9 +90,14 @@ function History() {
         }
     }, [currentPage, totalPages]);
 
-    const handleViewReview = (attemptId,quizId) => {
+    const CURR_ROLE=localStorage.getItem("role");
+    const handleViewReview = (attemptId, quizId) => {
         localStorage.setItem("attemptId", attemptId);
-        navigate(`/student/quizzes/${quizId}/reviewPage/${attemptId}`);
+        if(CURR_ROLE==="STUDENT"){
+            navigate(`/student/quizzes/${quizId}/reviewPage/${attemptId}`);
+        }else{
+            navigate(`/admin/users/${studentId}/${attemptId}`);
+        }
     };
 
     function goToPreviousPage() {
@@ -123,7 +152,7 @@ function History() {
                         <button
                             key={attempt.attemptId}
                             type="button"
-                            onClick={(attemptId,quizId) => handleViewReview(attempt.attemptId,attempt.quizId)}
+                            onClick={(attemptId, quizId) => handleViewReview(attempt.attemptId, attempt.quizId)}
                             className="flex w-full items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white p-4 text-left shadow-sm transition hover:border-indigo-200 hover:bg-slate-50"
                         >
                             <div className="min-w-0">
