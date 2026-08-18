@@ -265,6 +265,10 @@ function AuthPage() {
         }
     }
 
+    const handleForgotPassword = () => {
+        navigate("/forgotPassword");
+    }
+
     return (
         <div className="min-w-screen min-h-screen flex items-center justify-center bg-gray-50 p-4">
             <div className="w-full max-w-sm border border-black/10 bg-white rounded-2xl shadow-lg">
@@ -336,7 +340,7 @@ function AuthPage() {
                                     )}
 
                                     <div className="text-right mt-2">
-                                        <button type="button" className="cursor-pointer text-indigo-600 text-sm">Forgot password?</button>
+                                        <button type="button" className="cursor-pointer text-indigo-600 text-sm" onClick={()=>handleForgotPassword()}>Forgot password?</button>
                                     </div>
 
                                     <button

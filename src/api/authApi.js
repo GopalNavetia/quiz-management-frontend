@@ -7,3 +7,15 @@ export const loginUser = (loginData) => {
 export const registerUser = (registerData) => {
     return api.post("/auth/register", registerData);
 };
+
+export const forgotPassword = (email) => {
+    return api.post("/auth/forgotPassword", { email });
+}
+
+export const verifyOtp = (email, otp) => {
+    return api.post("/auth/verifyOtp", { email, otp });
+}
+
+export const resetPassword = (email, otp, password) => {
+    return api.post("/auth/resetPassword", { email, otp, password });
+}
