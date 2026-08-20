@@ -139,3 +139,9 @@ export const deleteQuestion = async (quesId) => {
     const response = await api.delete(`/admin/question/deleteQuestion/${quesId}`);
     return response.data;
 }
+
+export const getLeaderboard = async () => {
+    const response = await api.get("/leaderboard");
+    return response.data;
+} 
+

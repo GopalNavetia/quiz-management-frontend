@@ -36,3 +36,8 @@ export const getQuizHistory = async () => {
     const response = await api.get(`/student/quizHistory`);
     return response.data;
 }
+
+export const getQuizAttemptStatus = async (attemptId) => {
+    const response = await api.get(`/student/quizAttemptStatus/${attemptId}`);
+    return response.data;
+}

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getQuizQuestions, submitQuiz } from "../../../../api/studentDashboardApi";
+import { getQuizQuestions, submitQuiz, getQuizAttemptStatus } from "../../../../api/studentDashboardApi";
 
 function formatTime(totalSeconds) {
     const minutes = Math.floor(totalSeconds / 60);
@@ -33,6 +33,7 @@ function AttemptQuizWindow() {
     const [totalTimeInSeconds, setTotalTimeInSeconds] = useState(0);
     const [questions, setQuestions] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [remainingSeconds, setRemainingSeconds] = useState(0);
 
     const [currentIndex, setCurrentIndex] = useState(0);
     const [selectedAnswers, setSelectedAnswers] = useState({});
@@ -64,6 +65,49 @@ function AttemptQuizWindow() {
     useEffect(() => {
         fetchQuestions();
     }, [quizId]);
+
+    useEffect(() => {
+        const attemptId = localStorage.getItem("attemptId");
+        if (!attemptId) return;
+
+        async function fetchStatus() {
+            const status = await getQuizAttemptStatus(attemptId);
+            setRemainingSeconds(status.remainingSeconds);
+        }
+        fetchStatus();
+    }, []);
+
+    useEffect(() => {
+        if (remainingSeconds <= 0) return;
+
+        const intervalId = setInterval(() => {
+            setRemainingSeconds((prev) => {
+                if (prev <= 1) {
+                    clearInterval(intervalId);
+                    handleAutoSubmit();
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+        return () => clearInterval(intervalId);
+    }, [remainingSeconds > 0]);
+
+    const handleAutoSubmit = async () => {
+        const attemptId = localStorage.getItem("attemptId");
+        const answers = Object.entries(selectedAnswers).map(([questionId, optionKey]) => ({
+            questionId: Number(questionId),
+            selectedOption: optionKey.replace("option", "")
+        }));
+
+        try {
+            await submitQuiz({ attemptId: attemptId ? Number(attemptId) : null, answers });
+            localStorage.removeItem("attemptId");
+            navigate(`/student/quizzes/${quizId}/reviewPage/${attemptId}`, { replace: true });
+        } catch (error) {
+            alert("Time's up — auto-submit failed: " + (error.response?.data || "unknown error"));
+        }
+    };
 
     const currentQuestion = questions[currentIndex];
     const totalQuestions = questions.length;
@@ -111,7 +155,7 @@ function AttemptQuizWindow() {
         try {
             setSubmitting(true);
             await submitQuiz(submitData);
-            
+
             // Clear attemptId from localStorage after successful submission
             localStorage.removeItem("attemptId");
 
@@ -164,7 +208,7 @@ function AttemptQuizWindow() {
                     {/* timer is static for now, not counting down */}
                     <div className="flex shrink-0 items-center gap-1.5 rounded-full bg-rose-50 px-3 py-1.5 text-sm font-semibold text-rose-600">
                         <i className="fa-regular fa-clock" />
-                        <span>{formatTime(totalTimeInSeconds)}</span>
+                        <span>{formatTime(remainingSeconds)}</span>
                     </div>
                 </div>
 
@@ -237,16 +281,14 @@ function AttemptQuizWindow() {
                                 key={option.key}
                                 type="button"
                                 onClick={() => handleSelectOption(currentQuestion.id, option.key)}
-                                className={`flex w-full items-center gap-3 rounded-xl border px-4 py-3 text-left text-sm ${
-                                    isSelected
-                                        ? "border-indigo-600 bg-indigo-50 text-indigo-700"
-                                        : "border-slate-200 text-slate-700 hover:bg-slate-50"
-                                }`}
+                                className={`flex w-full items-center gap-3 rounded-xl border px-4 py-3 text-left text-sm ${isSelected
+                                    ? "border-indigo-600 bg-indigo-50 text-indigo-700"
+                                    : "border-slate-200 text-slate-700 hover:bg-slate-50"
+                                    }`}
                             >
                                 <span
-                                    className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2 ${
-                                        isSelected ? "border-indigo-600" : "border-slate-300"
-                                    }`}
+                                    className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2 ${isSelected ? "border-indigo-600" : "border-slate-300"
+                                        }`}
                                 >
                                     {isSelected && <span className="h-2 w-2 rounded-full bg-indigo-600" />}
                                 </span>

@@ -328,7 +328,7 @@ function EditQuiz() {
                             disabled={isLoading}
                             className="w-full cursor-pointer rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-70"
                         >
-                            {isLoading ? "Adding..." : "Add Quiz"}
+                            {isLoading ? "Editing..." : "Edit Quiz"}
                         </button>
                     </div>
                 </form>
