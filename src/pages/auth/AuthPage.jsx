@@ -112,7 +112,12 @@ function AuthPage() {
 
         try {
 
-            const response = await loginUser(loginData);
+            const payload = {
+                ...loginData,
+                role: role.toUpperCase()
+            };
+
+            const response = await loginUser(payload);
 
             localStorage.setItem("token", response.data.token);
             localStorage.setItem("role", response.data.role);
@@ -128,7 +133,8 @@ function AuthPage() {
 
             setLoginData({
                 email: "",
-                password: ""
+                password: "",
+                role: role.toUpperCase()
             });
 
             setLoginErrors({
@@ -246,7 +252,8 @@ function AuthPage() {
 
             setLoginData({
                 email: "",
-                password: ""
+                password: "",
+                role: role.toUpperCase() 
             });
 
             setLoginErrors({
@@ -340,7 +347,7 @@ function AuthPage() {
                                     )}
 
                                     <div className="text-right mt-2">
-                                        <button type="button" className="cursor-pointer text-indigo-600 text-sm" onClick={()=>handleForgotPassword()}>Forgot password?</button>
+                                        <button type="button" className="cursor-pointer text-indigo-600 text-sm" onClick={() => handleForgotPassword()}>Forgot password?</button>
                                     </div>
 
                                     <button
